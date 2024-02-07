@@ -20,7 +20,7 @@
 Создать виртуальное окружение
 ```commandline
 python3.11 -m venv venv (Linux)
-py -3.11 -m venv venv (Windows
+py -3.11 -m venv venv (Windows)
 ```
 
 Активировать 
