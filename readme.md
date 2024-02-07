@@ -19,12 +19,14 @@
 
 Создать виртуальное окружение
 ```commandline
-python3.11 -m venv venv
+python3.11 -m venv venv (Linux)
+py -3.11 -m venv venv (Windows
 ```
 
 Активировать 
 ```commandline
-source venv/bin/activate
+source venv/bin/activate (Linux)
+venv\Scripts\activate.bat (Windows)
 ```
 
 Установить необходимые библиотеки 
