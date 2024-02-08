@@ -1,13 +1,15 @@
 import datetime
+import os.path
 
 import numpy as np
 import pandas as pd
-from exceptions import UserNotFoundError
+from flask import current_app as app
 from models import CalculationHistory, Session, User
+from utils import DatasetNotFoundError, UserNotFoundError
 
 
 class AnalyzeService:
-    def __init__(self, filepath: str, user_email: str):
+    def __init__(self, filename: str, user_email: str):
         self._errors = {}
 
         try:
@@ -16,8 +18,15 @@ class AnalyzeService:
         except AttributeError:
             raise UserNotFoundError
 
-        self._filename = filepath.split("/")[-1]
-        self._df = pd.read_csv(filepath)
+        datasets_folder = f"{os.path.dirname(os.path.dirname(__file__))}{app.config['FILE_UPLOAD_FOLDER']}"
+        if not os.path.exists(datasets_folder):
+            os.mkdir(datasets_folder)
+
+        if not os.path.isfile(f"{datasets_folder}/{filename}"):
+            raise DatasetNotFoundError(datasets_folder)
+
+        self._df = pd.read_csv(f"{datasets_folder}/{filename}")
+        self._filename = filename
 
         # переводим даты в формат datetime
         date_column = self._df.columns[0]
@@ -152,7 +161,9 @@ class AnalyzeService:
         try:
             self.check_seasonal_trend()
         except Exception as e:
-            self._errors["trends_check"] = {} if "trends_check" not in self._errors.keys() else self._errors["trends_check"]
+            self._errors["trends_check"] = (
+                {} if "trends_check" not in self._errors.keys() else self._errors["trends_check"]
+            )
             self._errors["trends_check"]["seasonal"] = str(e)
 
         result = {

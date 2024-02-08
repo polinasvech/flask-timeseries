@@ -7,8 +7,8 @@ from flask import Flask
 from flask import json as flask_json
 from flask import request
 from models import User
-from services import (AnalyzeService, FileExtensionError, FileService,
-                      UserService)
+from services import AnalyzeService, FileService, UserService
+from utils import FileExtensionError, DatasetNotFoundError, UserNotFoundError
 
 app = Flask(__name__)
 
@@ -43,11 +43,15 @@ def upload_file():
 def analyze():
     email = request.values["email"]
     filename = request.values["filename"]
-    analyze_service = AnalyzeService(
-        filepath=f"{os.path.dirname(os.path.dirname(__file__))}/app{app.config['FILE_UPLOAD_FOLDER']}/{filename}",
-        user_email=email,
-    )
-    result = analyze_service.analyze()
+
+    try:
+        analyze_service = AnalyzeService(
+            filename=filename,
+            user_email=email,
+        )
+        result = analyze_service.analyze()
+    except (UserNotFoundError, DatasetNotFoundError) as e:
+        return e.message, 400
 
     response = app.response_class(response=flask_json.dumps(result), mimetype="application/json")
     return response, 200

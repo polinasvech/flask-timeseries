@@ -26,8 +26,13 @@ GET_USERS_SWAG = {"responses": {200: {"description": "List of users", "schema": 
 UPLOAD_DATASET_SWAG = {
     "summary": "Upload dataset",
     "consumes": ["multipart/form-data"],
-    "parameters": [{"name": "file", "in": "formData", "description": "Dataset", "required": True, "type": "file"}],
-    "responses": {200: {"description": "Success"}, 422: {"description": "Unprocessable entity"}},
+    "parameters": [
+        {"name": "file", "in": "formData", "description": "Dataset", "required": True, "type": "file"}
+    ],
+    "responses": {
+        200: {"description": "Success"},
+        400: {"description": "Bad Request"}
+    },
 }
 
 ANALYZE_DATASET_SWAG = {
@@ -50,7 +55,10 @@ ANALYZE_DATASET_SWAG = {
             "type": "string",
         },
     ],
-    "responses": {200: {"description": "Analysis result", "schema": AnalysisResultSchema}, 404: {"description": "Some error"}},
+    "responses": {
+        200: {"description": "Analysis result", "schema": AnalysisResultSchema},
+        400: {"description": "Bad Request"}
+    },
 }
 
 CALC_HISTORY_SWAG = {
@@ -65,5 +73,8 @@ CALC_HISTORY_SWAG = {
             "type": "string",
         },
     ],
-    "responses": {200: {"description": "Calculation history", "schema": CalcHistorySchema}, 404: {"description": "Some error"}},
+    "responses": {
+        200: {"description": "Calculation history", "schema": CalcHistorySchema},
+        400: {"description": "Bad Request"}
+    },
 }

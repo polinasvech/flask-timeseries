@@ -2,14 +2,8 @@ import os
 import re
 
 from flask import current_app as app
+from utils import FileExtensionError
 from werkzeug.datastructures.file_storage import FileStorage
-
-
-class FileExtensionError(Exception):
-    def __init__(self, filename):
-        file_ext = filename.split(".")
-        self.message = f"Invalid file extension: {file_ext[-1]}"
-        super().__init__(self.message)
 
 
 class FileService:

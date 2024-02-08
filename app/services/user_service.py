@@ -1,8 +1,8 @@
 from typing import Optional
 
-from exceptions import UserNotFoundError
 from models import CalculationHistory, Session, User
 from pydantic import BaseModel
+from utils import UserNotFoundError
 
 
 class UserSchema(BaseModel):
@@ -57,6 +57,8 @@ class UserService:
             except AttributeError:
                 raise UserNotFoundError
 
-            history_items = session.query(CalculationHistory).filter(CalculationHistory.user_id == user_id).all()
+            history_items = (
+                session.query(CalculationHistory).filter(CalculationHistory.user_id == user_id).all()
+            )
 
         return [HistoryItemSchema(i).dict() for i in history_items]
