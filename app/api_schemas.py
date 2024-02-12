@@ -66,7 +66,7 @@ CALC_HISTORY_SWAG = {
     "parameters": [
         {
             "name": "email",
-            "in": "formData",
+            "in": "query",
             "description": "User email",
             "default": "user1@example.com",
             "required": True,

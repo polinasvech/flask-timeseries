@@ -57,7 +57,7 @@ def analyze():
     return response, 200
 
 
-@app.post("/calculation_history")
+@app.get("/calculation_history")
 @swag_from(CALC_HISTORY_SWAG)
 def get_calculation_history():
     email = request.values["email"]
