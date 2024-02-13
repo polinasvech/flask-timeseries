@@ -20,3 +20,11 @@ class FileService:
         uploaded_file.save(f"{datasets_folder}/{uploaded_file.filename}")
 
         return uploaded_file.filename
+
+    @staticmethod
+    def list_datasets():
+        """Для перечисления возможных для анализа датасетов"""
+        from swagger_schemas import ANALYZE_DATASET
+
+        datasets_folder = f"{os.path.dirname(os.path.dirname(__file__))}{app.config['FILE_UPLOAD_FOLDER']}"
+        ANALYZE_DATASET["parameters"][0]["enum"] = os.listdir(datasets_folder)

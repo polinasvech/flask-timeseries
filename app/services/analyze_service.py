@@ -9,14 +9,9 @@ from utils import DatasetNotFoundError, UserNotFoundError
 
 
 class AnalyzeService:
-    def __init__(self, filename: str, user_email: str):
+    def __init__(self, filename: str, user_id: str):
         self._errors = {}
-
-        try:
-            with Session() as session:
-                self._user_id = session.query(User).filter(User.email == user_email).first().id
-        except AttributeError:
-            raise UserNotFoundError
+        self._user_id = user_id
 
         datasets_folder = f"{os.path.dirname(os.path.dirname(__file__))}{app.config['FILE_UPLOAD_FOLDER']}"
         if not os.path.exists(datasets_folder):

@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from flask_login import UserMixin
 from sqlalchemy import (JSON, Boolean, Column, DateTime, ForeignKey, Integer,
                         String, Text, create_engine, event)
 from sqlalchemy.ext.declarative import declarative_base
@@ -12,7 +13,7 @@ Base = declarative_base()
 Session = sessionmaker(bind=engine)
 
 
-class User(Base):
+class User(UserMixin, Base):
     """
     Модель пользователя
     """
@@ -31,7 +32,7 @@ primary_records = [
 ]
 
 
-# Добавляем listener для отслеживание событияbd создания таблицы пользователей
+# Добавляем listener для отслеживание события создания таблицы пользователей
 # если событие произошло - добавляем записи
 @event.listens_for(User.__table__, "after_create")
 def insert_initial_values(*args, **kwargs):

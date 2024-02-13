@@ -34,6 +34,35 @@ class HistoryItemSchema(BaseModel):
 
 class UserService:
     @staticmethod
+    def get_user_by_id(user_id):
+        """
+        Получение пользователя по id
+        """
+        with Session() as session:
+            user = session.query(User).filter(User.id == user_id).first()
+        return user
+
+    @staticmethod
+    def get_user_by_email(email):
+        """
+        Получение пользователя по email
+        """
+        with Session() as session:
+            user = session.query(User).filter(User.email == email).first()
+        return user
+
+    @staticmethod
+    def auth_user(user, password):
+        """
+        Для проверки данных пользователя
+
+        :return: True если пароли совпадают
+        """
+        if user.password == password:
+            return True
+        return False
+
+    @staticmethod
     def list_users():
         """
         Для получения списка пользователей
@@ -45,20 +74,13 @@ class UserService:
             return [UserSchema(id=user.id, email=user.email).dict() for user in users]
 
     @staticmethod
-    def user_calc_history(email: str = None):
+    def user_calc_history(user_id: int = None):
         """
         Для получения списка пользователей
 
         :return: список пользователей
         """
         with Session() as session:
-            try:
-                user_id = session.query(User).filter(User.email == email).first().id
-            except AttributeError:
-                raise UserNotFoundError
-
-            history_items = (
-                session.query(CalculationHistory).filter(CalculationHistory.user_id == user_id).all()
-            )
+            history_items = session.query(CalculationHistory).filter(CalculationHistory.user_id == user_id).all()
 
         return [HistoryItemSchema(i).dict() for i in history_items]
