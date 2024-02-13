@@ -7,7 +7,7 @@ from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
 from models import User
 from services import AnalyzeService, FileService, UserService
-from utils import DatasetNotFoundError, FileExtensionError, UserNotFoundError
+from utils import DatasetNotFoundError, FileExtensionError, UserNotFoundError, NotTimeSeriesError
 
 app = Flask(__name__)
 
@@ -75,7 +75,7 @@ def upload_file():
 
     try:
         filename = FileService.save_file(uploaded_file)
-    except FileExtensionError as e:
+    except (FileExtensionError, NotTimeSeriesError) as e:
         return e.message, 422
 
     return f"File {filename} saved successfully", 200

@@ -14,6 +14,12 @@ class FileExtensionError(Exception):
         super().__init__(self.message)
 
 
+class NotTimeSeriesError(Exception):
+    def __init__(self):
+        self.message = "First column should contain dates"
+        super().__init__(self.message)
+
+
 class DatasetNotFoundError(Exception):
     def __init__(self, datasets_folder):
         self.message = (
