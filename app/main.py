@@ -7,8 +7,8 @@ from flask import request
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
 from services import AnalyzeService, FileService, UserService
-from utils import (DatasetNotFoundError, EmptyFileError, FileExtensionError,
-                   NotTimeSeriesError, UserNotFoundError)
+from exceptions import (DatasetNotFoundError, EmptyFileError, FileExtensionError,
+                        NotTimeSeriesError, UserNotFoundError)
 
 app = Flask(__name__)
 # для авторизации

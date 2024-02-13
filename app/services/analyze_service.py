@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from flask import current_app as app
 from models import CalculationHistory, Session
-from utils import DatasetNotFoundError, EmptyFileError
+from exceptions import DatasetNotFoundError, EmptyFileError
 
 
 class AnalyzeService:

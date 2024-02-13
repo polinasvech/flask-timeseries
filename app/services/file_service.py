@@ -3,7 +3,7 @@ import re
 
 import pandas as pd
 from flask import current_app as app
-from utils import FileExtensionError, NotTimeSeriesError
+from exceptions import FileExtensionError, NotTimeSeriesError
 from werkzeug.datastructures.file_storage import FileStorage
 
 

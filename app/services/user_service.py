@@ -2,7 +2,7 @@ from typing import List, Optional, Union
 
 from models import CalculationHistory, Session, User
 from pydantic import BaseModel
-from utils import UserNotFoundError
+from exceptions import UserNotFoundError
 
 
 class UserSchema(BaseModel):
