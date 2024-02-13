@@ -14,6 +14,12 @@ class FileExtensionError(Exception):
         super().__init__(self.message)
 
 
+class EmptyFileError(Exception):
+    def __init__(self):
+        self.message = "File is empty"
+        super().__init__(self.message)
+
+
 class NotTimeSeriesError(Exception):
     def __init__(self):
         self.message = "First column should contain dates"

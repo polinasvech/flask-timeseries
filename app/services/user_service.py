@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional, Union
 
 from models import CalculationHistory, Session, User
 from pydantic import BaseModel
@@ -34,7 +34,21 @@ class HistoryItemSchema(BaseModel):
 
 class UserService:
     @staticmethod
-    def get_user_by_id(user_id):
+    def create(email, password) -> User:
+        """
+        Создание нового пользователя
+        """
+        from bcrypt_settings import bcrypt
+
+        hashed_pass = bcrypt.generate_password_hash(password).decode("utf-8")
+        user = User(email=email, password=hashed_pass)
+        with Session() as session:
+            session.add(user)
+            session.commit()
+        return user
+
+    @staticmethod
+    def get_user_by_id(user_id) -> User:
         """
         Получение пользователя по id
         """
@@ -43,27 +57,24 @@ class UserService:
         return user
 
     @staticmethod
-    def get_user_by_email(email):
-        """
-        Получение пользователя по email
-        """
-        with Session() as session:
-            user = session.query(User).filter(User.email == email).first()
-        return user
-
-    @staticmethod
-    def auth_user(user, password):
+    def auth_user(email, password) -> Union[User, None]:
         """
         Для проверки данных пользователя
 
         :return: True если пароли совпадают
         """
-        if user.password == password:
-            return True
-        return False
+        from bcrypt_settings import bcrypt
+
+        with Session() as session:
+            user = session.query(User).filter(User.email == email).first()
+        if not user:
+            raise UserNotFoundError
+
+        if bcrypt.check_password_hash(user.password, password):
+            return user
 
     @staticmethod
-    def list_users():
+    def list_users() -> List[dict]:
         """
         Для получения списка пользователей
 
@@ -74,7 +85,7 @@ class UserService:
             return [UserSchema(id=user.id, email=user.email).dict() for user in users]
 
     @staticmethod
-    def user_calc_history(user_id: int = None):
+    def user_calc_history(user_id: int = None) -> List[dict]:
         """
         Для получения списка пользователей
 

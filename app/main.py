@@ -1,3 +1,4 @@
+import sqlalchemy.exc
 import swagger_schemas
 from flasgger import Swagger, swag_from
 from flask import Flask
@@ -5,12 +6,12 @@ from flask import json as flask_json
 from flask import request
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
-from models import User
 from services import AnalyzeService, FileService, UserService
-from utils import DatasetNotFoundError, FileExtensionError, UserNotFoundError, NotTimeSeriesError
+from utils import (DatasetNotFoundError, EmptyFileError, FileExtensionError,
+                   NotTimeSeriesError, UserNotFoundError)
 
 app = Flask(__name__)
-
+# для авторизации
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -28,19 +29,40 @@ def load_user(user):
 
 
 @app.post("/login")
-@swag_from(swagger_schemas.AUTH)
+@swag_from(swagger_schemas.LOGIN)
 def login():
     email = request.values["email"]
     password = request.values["password"]
 
-    user = UserService.get_user_by_email(email)
-    if not user:
-        return "User not found", 404
-    if not UserService.auth_user(user, password):
-        return "Wrong password", 401
+    try:
+        user = UserService.auth_user(email, password)
+    except UserNotFoundError as e:
+        return e.message, 404
 
-    login_user(user)
-    return "Success", 200
+    if user:
+        login_user(user)
+        return "Success", 200
+
+    return "Wrong password", 401
+
+
+@app.post("/register")
+@swag_from(swagger_schemas.REGISTER)
+def register():
+    email = request.values["email"]
+    password = request.values["password"]
+    repeated_password = request.values["repeated_password"]
+
+    if password != repeated_password:
+        return f"Password mismatch", 400
+
+    try:
+        user = UserService.create(email, password)
+    except sqlalchemy.exc.IntegrityError:
+        return f"User with email {email} already exists", 209
+
+    if user:
+        return f"Created user {email}", 201
 
 
 @app.post("/logout")
@@ -54,7 +76,7 @@ def logout():
 @swag_from(swagger_schemas.GET_USERS)
 @login_required
 def get_users():
-    users: list[User] = UserService.list_users()
+    users = UserService.list_users()
     return users
 
 
@@ -93,7 +115,7 @@ def analyze():
             user_id=current_user.get_id(),
         )
         result = analyze_service.analyze()
-    except (UserNotFoundError, DatasetNotFoundError) as e:
+    except (UserNotFoundError, DatasetNotFoundError, EmptyFileError) as e:
         return e.message, 400
 
     response = app.response_class(response=flask_json.dumps(result), mimetype="application/json")

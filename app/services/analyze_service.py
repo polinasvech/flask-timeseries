@@ -4,8 +4,8 @@ import os.path
 import numpy as np
 import pandas as pd
 from flask import current_app as app
-from models import CalculationHistory, Session, User
-from utils import DatasetNotFoundError, UserNotFoundError
+from models import CalculationHistory, Session
+from utils import DatasetNotFoundError, EmptyFileError
 
 
 class AnalyzeService:
@@ -20,7 +20,11 @@ class AnalyzeService:
         if not os.path.isfile(f"{datasets_folder}/{filename}"):
             raise DatasetNotFoundError(datasets_folder)
 
-        self._df = pd.read_csv(f"{datasets_folder}/{filename}")
+        try:
+            self._df = pd.read_csv(f"{datasets_folder}/{filename}")
+        except pd.errors.EmptyDataError:
+            raise EmptyFileError
+
         self._filename = filename
 
         # переводим даты в формат datetime

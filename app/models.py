@@ -25,24 +25,6 @@ class User(UserMixin, Base):
     password = Column(String(100), nullable=False)
 
 
-# Пользователи, которые будут добавлены в таблицу при создании базы
-primary_records = [
-    {"email": "user1@example.com", "password": "password1"},
-    {"email": "user2@example.com", "password": "password2"},
-]
-
-
-# Добавляем listener для отслеживание события создания таблицы пользователей
-# если событие произошло - добавляем записи
-@event.listens_for(User.__table__, "after_create")
-def insert_initial_values(*args, **kwargs):
-    with Session() as session:
-        for record in primary_records:
-            user = User(**record)
-            session.add(user)
-        session.commit()
-
-
 class CalculationHistory(Base):
     """
     Модель для хранения истории вычислений

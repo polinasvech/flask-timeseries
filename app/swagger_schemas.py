@@ -1,7 +1,6 @@
 from typing import Optional
 
 from flasgger import Schema, fields
-from services import FileService
 
 
 class UserApiSchema(Schema):
@@ -27,7 +26,42 @@ SWAGGER_SETTINGS = {
     "title": "Analyze dataset API",
 }
 
-AUTH = {
+REGISTER = {
+    "summary": "Register user",
+    "parameters": [
+        {
+            "name": "email",
+            "in": "query",
+            "description": "Email",
+            "required": True,
+            "type": "string",
+            "format": "email",
+        },
+        {
+            "name": "password",
+            "in": "query",
+            "description": "Password",
+            "required": True,
+            "type": "string",
+            "format": "password",
+        },
+        {
+            "name": "repeated_password",
+            "in": "query",
+            "description": "Repeat password",
+            "required": True,
+            "type": "string",
+            "format": "password",
+        },
+    ],
+    "responses": {
+        201: {"description": "Created user"},
+        209: {"description": "Already exists"},
+        400: {"description": "Bad Request"},
+    },
+}
+
+LOGIN = {
     "summary": "Authorize user",
     "parameters": [
         {
@@ -36,6 +70,7 @@ AUTH = {
             "description": "Email",
             "required": True,
             "type": "string",
+            "format": "email",
         },
         {
             "name": "password",
@@ -53,6 +88,12 @@ AUTH = {
     },
 }
 
+LOGOUT = {
+    "summary": "Logout",
+    "responses": {
+        200: {"description": "Success"},
+    },
+}
 
 GET_USERS = {
     "responses": {200: {"description": "List of users", "schema": UserApiSchema}},
@@ -87,12 +128,5 @@ CALC_HISTORY = {
     "responses": {
         200: {"description": "Calculation history", "schema": CalcHistorySchema},
         400: {"description": "Bad Request"},
-    },
-}
-
-LOGOUT = {
-    "summary": "Logout",
-    "responses": {
-        200: {"description": "Success"},
     },
 }
