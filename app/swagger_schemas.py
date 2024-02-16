@@ -1,27 +1,3 @@
-from typing import Optional
-
-from flasgger import Schema, fields
-
-
-class UserApiSchema(Schema):
-    id = fields.Integer(description="User ID")
-    username = fields.String(description="Username")
-    created_at = fields.DateTime(description="Registration date")
-
-
-class AnalysisResultSchema(Schema):
-    success: bool
-    anomalies: Optional[dict] = None
-    stationarity: Optional[dict] = None
-    autocorrelation: Optional[dict] = None
-    trends: Optional[dict] = None
-    errors: Optional[dict] = None
-
-
-class CalcHistorySchema(Schema):
-    history: list[AnalysisResultSchema] = None
-
-
 SWAGGER_SETTINGS = {
     "version": "1.0.0",
     "title": "Analyze dataset API",
@@ -32,14 +8,14 @@ REGISTER = {
     "parameters": [
         {
             "name": "username",
-            "in": "query",
+            "in": "formData",
             "description": "Username",
             "required": True,
             "type": "string",
         },
         {
             "name": "password",
-            "in": "query",
+            "in": "formData",
             "description": "Password",
             "required": True,
             "type": "string",
@@ -47,7 +23,7 @@ REGISTER = {
         },
         {
             "name": "repeated_password",
-            "in": "query",
+            "in": "formData",
             "description": "Repeat password",
             "required": True,
             "type": "string",
@@ -66,14 +42,14 @@ LOGIN = {
     "parameters": [
         {
             "name": "username",
-            "in": "query",
+            "in": "formData",
             "description": "Username",
             "required": True,
             "type": "string",
         },
         {
             "name": "password",
-            "in": "query",
+            "in": "formData",
             "description": "Password",
             "required": True,
             "type": "string",
@@ -95,7 +71,7 @@ LOGOUT = {
 }
 
 GET_USERS = {
-    "responses": {200: {"description": "List of users", "schema": UserApiSchema}},
+    "responses": {200: {"description": "List of users"}},
 }
 
 UPLOAD_DATASET = {
@@ -117,7 +93,7 @@ ANALYZE_DATASET = {
         },
     ],
     "responses": {
-        200: {"description": "Analysis result", "schema": AnalysisResultSchema},
+        200: {"description": "Analysis result"},
         400: {"description": "Bad Request"},
     },
 }
@@ -125,7 +101,7 @@ ANALYZE_DATASET = {
 CALC_HISTORY = {
     "summary": "Get calculation history",
     "responses": {
-        200: {"description": "Calculation history", "schema": CalcHistorySchema},
+        200: {"description": "Calculation history"},
         400: {"description": "Bad Request"},
     },
 }

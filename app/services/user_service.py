@@ -1,37 +1,9 @@
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import List, Union
 
 from exceptions import UserNotFoundError
 from models import CalculationHistory, Session, User
-from pydantic import BaseModel
-
-
-class UserSchema(BaseModel):
-    id: int
-    username: str
-    registration_date: datetime
-
-
-class HistoryItemSchema(BaseModel):
-    time_series: str = None
-    date: str = None
-    success: bool = False
-    anomalies: Optional[dict] = None
-    stationarity: Optional[dict] = None
-    autocorrelation: Optional[dict] = None
-    trends: Optional[dict] = None
-    errors: Optional[dict] = None
-
-    def __init__(self, history_item):
-        super().__init__()
-        self.time_series = str(history_item.dataset_file_name)
-        self.date = history_item.calculation_date.strftime("%d/%m/%y %H:%M:%S")
-        self.success = history_item.success
-        self.anomalies = history_item.result["anomalies"]
-        self.stationarity = history_item.result["stationarity"]
-        self.autocorrelation = history_item.result["autocorrelation"]
-        self.trends = history_item.result["trends"]
-        self.errors = history_item.errors
+from schemas import UserSchema, HistoryItemSchema
 
 
 class UserService:
@@ -46,7 +18,7 @@ class UserService:
         user = User(
             username=username,
             password=hashed_pass,
-            created_at=datetime.datetime.now(),
+            created_at=datetime.now(),
         )
         with Session() as session:
             session.add(user)
@@ -94,13 +66,20 @@ class UserService:
             ]
 
     @staticmethod
-    def user_calc_history(user_id: int = None) -> List[dict]:
+    def user_calc_history(user_id: int = None) -> dict:
         """
-        Для получения списка пользователей
+        Для получения истории вычислений пользователя
 
         :return: список пользователей
         """
         with Session() as session:
+            username = session.query(User.username).filter(User.id == user_id).scalar()
             history_items = session.query(CalculationHistory).filter(CalculationHistory.user_id == user_id).all()
 
-        return [HistoryItemSchema(i).dict() for i in history_items]
+        result = {
+            "user": username,
+            "history": [HistoryItemSchema(i).dict() for i in history_items],
+            "total": len(history_items)
+        }
+
+        return result
