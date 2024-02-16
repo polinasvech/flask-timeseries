@@ -23,6 +23,7 @@ class User(UserMixin, Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class CalculationHistory(Base):

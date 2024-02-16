@@ -5,7 +5,8 @@ from flasgger import Schema, fields
 
 class UserApiSchema(Schema):
     id = fields.Integer(description="User ID")
-    email = fields.String(description="Email")
+    username = fields.String(description="Username")
+    created_at = fields.DateTime(description="Registration date")
 
 
 class AnalysisResultSchema(Schema):
@@ -30,12 +31,11 @@ REGISTER = {
     "summary": "Register user",
     "parameters": [
         {
-            "name": "email",
+            "name": "username",
             "in": "query",
-            "description": "Email",
+            "description": "Username",
             "required": True,
             "type": "string",
-            "format": "email",
         },
         {
             "name": "password",
@@ -65,12 +65,11 @@ LOGIN = {
     "summary": "Authorize user",
     "parameters": [
         {
-            "name": "email",
+            "name": "username",
             "in": "query",
-            "description": "Email",
+            "description": "Username",
             "required": True,
             "type": "string",
-            "format": "email",
         },
         {
             "name": "password",

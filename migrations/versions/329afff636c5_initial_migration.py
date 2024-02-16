@@ -1,40 +1,27 @@
-"""initial migration
-
-Revision ID: 329afff636c5
-Revises: 
-Create Date: 2024-02-03 19:17:16.236633
-
-"""
-
-from typing import Sequence, Union
-
-import sqlalchemy as sa
 from alembic import op
-
-# revision identifiers, used by Alembic.
-revision: str = "329afff636c5"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+import sqlalchemy as sa
 
 
 def upgrade():
     op.create_table(
         "users",
-        sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("username", sa.String(100), unique=True, nullable=False),
-        sa.Column("password", sa.String(100), nullable=False),
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("username", sa.String(length=100), nullable=False),
+        sa.Column("password", sa.String(length=100), nullable=False),
+        sa.Column("created_at", sa.DateTime, nullable=False),
+        sa.PrimaryKeyConstraint("id"),
     )
-
     op.create_table(
         "calculation_history",
-        sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("user_id", sa.Integer, sa.ForeignKey("users.id"), nullable=False),
-        sa.Column("file_name", sa.String(100), nullable=False),
-        sa.Column("date", sa.DateTime, nullable=False, default=sa.func.now()),
-        sa.Column("successful", sa.Boolean, nullable=False, default=sa.false()),
-        sa.Column("result", sa.JSON),
-        sa.Column("errors", sa.JSON),
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("dataset_file_name", sa.String(length=100), nullable=False),
+        sa.Column("calculation_date", sa.DateTime, nullable=False),
+        sa.Column("success", sa.Boolean(), nullable=False),
+        sa.Column("result", sa.JSON(), nullable=True),
+        sa.Column("errors", sa.JSON(), nullable=True),
+        sa.Column("user_id", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(["user_id"], ["users.id"]),
+        sa.PrimaryKeyConstraint("id"),
     )
 
 
