@@ -70,7 +70,7 @@ class UserService:
         """
         Для получения истории вычислений пользователя
 
-        :return: список пользователей
+        :return: список результатов вычислений пользователя
         """
         with Session() as session:
             username = session.query(User.username).filter(User.id == user_id).scalar()

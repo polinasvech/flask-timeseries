@@ -5,21 +5,43 @@ import pandas as pd
 from exceptions import FileExtensionError, NotTimeSeriesError
 from flask import current_app as app
 from werkzeug.datastructures.file_storage import FileStorage
+from dateutil.parser import parse
+
+
+def is_date(string, fuzzy=False):
+    """
+    Проверяет, можно ли интерпретировать строку как дату
+
+    :param string: str, строка, которую необходимо проверить на дату
+    :param fuzzy: bool, игнорировать неизвестные токены в строке, если значение True
+    """
+    try:
+        parse(string, fuzzy=fuzzy)
+        return True
+    except ValueError:
+        return False
 
 
 class FileService:
     @classmethod
     def save_file(cls, uploaded_file: FileStorage) -> str:
+        """
+        Сохранение нового датасета
+
+        :param uploaded_file: загруженный файл
+        :return: имя файла в случае успешной загрузки
+        """
         if not re.search(r"\.csv$", uploaded_file.filename):
             # если загрузили файл не .csv формата, возвращаем ошибку
             raise FileExtensionError(uploaded_file.filename)
 
         datasets_folder = cls.get_folder()
-
         new_df = pd.read_csv(uploaded_file)
+
         # тк анализируем временные ряды, если в первой колонке НЕ даты - ошибка
-        pattern = re.compile(r"(?i:date(time)?)")
-        if not re.match(pattern, new_df.columns[0]):
+        first_column = [str(x) for x in new_df.iloc[:, 0]]
+        first_column = list(map(lambda x: is_date(x), first_column))
+        if not all(first_column):
             raise NotTimeSeriesError
 
         new_df.to_csv(f"{datasets_folder}/{uploaded_file.filename}")
