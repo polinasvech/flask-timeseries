@@ -1,13 +1,15 @@
+from datetime import datetime
 from typing import List, Optional, Union
 
+from exceptions import UserNotFoundError
 from models import CalculationHistory, Session, User
 from pydantic import BaseModel
-from exceptions import UserNotFoundError
 
 
 class UserSchema(BaseModel):
     id: int
-    email: str
+    username: str
+    registration_date: datetime
 
 
 class HistoryItemSchema(BaseModel):
@@ -34,14 +36,18 @@ class HistoryItemSchema(BaseModel):
 
 class UserService:
     @staticmethod
-    def create(email, password) -> User:
+    def create(username, password) -> User:
         """
         Создание нового пользователя
         """
         from bcrypt_settings import bcrypt
 
         hashed_pass = bcrypt.generate_password_hash(password).decode("utf-8")
-        user = User(email=email, password=hashed_pass)
+        user = User(
+            username=username,
+            password=hashed_pass,
+            created_at=datetime.datetime.now(),
+        )
         with Session() as session:
             session.add(user)
             session.commit()
@@ -57,7 +63,7 @@ class UserService:
         return user
 
     @staticmethod
-    def auth_user(email, password) -> Union[User, None]:
+    def auth_user(username, password) -> Union[User, None]:
         """
         Для проверки данных пользователя
 
@@ -66,7 +72,7 @@ class UserService:
         from bcrypt_settings import bcrypt
 
         with Session() as session:
-            user = session.query(User).filter(User.email == email).first()
+            user = session.query(User).filter(User.username == username).first()
         if not user:
             raise UserNotFoundError
 
@@ -82,7 +88,10 @@ class UserService:
         """
         with Session() as session:
             users = session.query(User).all()
-            return [UserSchema(id=user.id, email=user.email).dict() for user in users]
+            return [
+                UserSchema(id=user.id, username=user.username, registration_date=user.created_at).dict()
+                for user in users
+            ]
 
     @staticmethod
     def user_calc_history(user_id: int = None) -> List[dict]:

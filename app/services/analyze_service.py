@@ -3,9 +3,9 @@ import os.path
 
 import numpy as np
 import pandas as pd
+from exceptions import DatasetNotFoundError, EmptyFileError
 from flask import current_app as app
 from models import CalculationHistory, Session
-from exceptions import DatasetNotFoundError, EmptyFileError
 
 
 class AnalyzeService:

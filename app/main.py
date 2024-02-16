@@ -1,5 +1,8 @@
 import sqlalchemy.exc
 import swagger_schemas
+from exceptions import (DatasetNotFoundError, EmptyFileError,
+                        FileExtensionError, NotTimeSeriesError,
+                        UserNotFoundError)
 from flasgger import Swagger, swag_from
 from flask import Flask
 from flask import json as flask_json
@@ -7,8 +10,6 @@ from flask import request
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user)
 from services import AnalyzeService, FileService, UserService
-from exceptions import (DatasetNotFoundError, EmptyFileError, FileExtensionError,
-                        NotTimeSeriesError, UserNotFoundError)
 
 app = Flask(__name__)
 # для авторизации
@@ -31,11 +32,11 @@ def load_user(user):
 @app.post("/login")
 @swag_from(swagger_schemas.LOGIN)
 def login():
-    email = request.values["email"]
+    username = request.values["username"]
     password = request.values["password"]
 
     try:
-        user = UserService.auth_user(email, password)
+        user = UserService.auth_user(username, password)
     except UserNotFoundError as e:
         return e.message, 404
 
@@ -49,7 +50,7 @@ def login():
 @app.post("/register")
 @swag_from(swagger_schemas.REGISTER)
 def register():
-    email = request.values["email"]
+    username = request.values["username"]
     password = request.values["password"]
     repeated_password = request.values["repeated_password"]
 
@@ -57,12 +58,12 @@ def register():
         return f"Password mismatch", 400
 
     try:
-        user = UserService.create(email, password)
+        user = UserService.create(username, password)
     except sqlalchemy.exc.IntegrityError:
-        return f"User with email {email} already exists", 209
+        return f"User {username} already exists", 209
 
     if user:
-        return f"Created user {email}", 201
+        return f"Created user {username}", 201
 
 
 @app.post("/logout")
