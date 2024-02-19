@@ -26,16 +26,7 @@ class UserService:
         return user
 
     @staticmethod
-    def get_user_by_id(user_id) -> User:
-        """
-        Получение пользователя по id
-        """
-        with Session() as session:
-            user = session.query(User).filter(User.id == user_id).first()
-        return user
-
-    @staticmethod
-    def auth_user(username, password) -> Union[User, None]:
+    def auth(username, password) -> Union[User, None]:
         """
         Для проверки данных пользователя
 
@@ -50,6 +41,15 @@ class UserService:
 
         if bcrypt.check_password_hash(user.password, password):
             return user
+
+    @staticmethod
+    def get_user_by_id(user_id) -> User:
+        """
+        Получение пользователя по id
+        """
+        with Session() as session:
+            user = session.query(User).filter(User.id == user_id).first()
+        return user
 
     @staticmethod
     def list_users() -> List[dict]:

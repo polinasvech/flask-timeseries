@@ -32,7 +32,7 @@ REGISTER = {
     ],
     "responses": {
         201: {"description": "Created user"},
-        209: {"description": "Already exists"},
+        409: {"description": "Already exists"},
         400: {"description": "Bad Request"},
     },
 }

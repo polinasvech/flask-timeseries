@@ -36,7 +36,7 @@ def login():
     password = request.values["password"]
 
     try:
-        user = UserService.auth_user(username, password)
+        user = UserService.auth(username, password)
     except UserNotFoundError as e:
         return e.message, 404
 
@@ -60,7 +60,7 @@ def register():
     try:
         user = UserService.create(username, password)
     except sqlalchemy.exc.IntegrityError:
-        return f"User {username} already exists", 209
+        return f"User {username} already exists", 409
 
     if user:
         return f"Created user {username}", 201
