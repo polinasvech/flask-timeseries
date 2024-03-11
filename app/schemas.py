@@ -13,6 +13,8 @@ class UserSchema(BaseModel):
     id: int
     username: str
     registration_date: datetime
+    updated_at: datetime | None = None
+    deleted_at: datetime | None = None
 
 
 class HistoryItemSchema(BaseModel):

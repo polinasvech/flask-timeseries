@@ -5,6 +5,7 @@ from flask import current_app as app
 from flask_bcrypt import Bcrypt
 from models import CalculationHistory, Session, User
 from schemas import HistoryItemSchema, UpdateUserSchema, UserSchema
+from sqlalchemy import and_
 
 
 class UserService:
@@ -18,7 +19,6 @@ class UserService:
         user = User(
             username=username,
             password=hashed_pass,
-            created_at=datetime.now(),
         )
         with Session() as session:
             session.add(user)
@@ -41,6 +41,17 @@ class UserService:
             user = session.query(User).where(User.id == user_info["id"]).first()
             for key, value in user_info.items():
                 setattr(user, key, value)
+            user.updated_at = datetime.now()
+            session.commit()
+
+    @classmethod
+    def delete(cls, user_id: int):
+        """
+        Обновление данных пользователя
+        """
+        with Session() as session:
+            user = session.query(User).where(User.id == user_id).first()
+            user.deleted_at = datetime.now()
             session.commit()
 
     @staticmethod
@@ -51,7 +62,7 @@ class UserService:
         :return: True если пароли совпадают
         """
         with Session() as session:
-            user = session.query(User).filter(User.username == username).first()
+            user = session.query(User).where(and_(User.username == username, User.deleted_at.is_(None))).first()
         if not user:
             raise UserNotFoundError
 
@@ -82,6 +93,8 @@ class UserService:
                     id=user.id,
                     username=user.username,
                     registration_date=user.created_at,
+                    updated_at=user.updated_at,
+                    deleted_at=user.deleted_at,
                 ).dict()
                 for user in users
             ]

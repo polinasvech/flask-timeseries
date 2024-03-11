@@ -20,8 +20,8 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    updated_at = sa.Column("updated_at", sa.DateTime(), default=datetime.utcnow, nullable=True)
-    deleted_at = sa.Column("deleted_at", sa.DateTime(), default=datetime.utcnow, nullable=True)
+    updated_at = sa.Column("updated_at", sa.DateTime(), nullable=True)
+    deleted_at = sa.Column("deleted_at", sa.DateTime(), nullable=True)
 
     op.add_column("users", updated_at)
     op.add_column("users", deleted_at)

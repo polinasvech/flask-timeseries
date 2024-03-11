@@ -24,8 +24,8 @@ class User(UserMixin, Base):
     password = Column(String(100), nullable=False)
 
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, nullable=True)
-    deleted_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    updated_at = Column(DateTime, nullable=True)
+    deleted_at = Column(DateTime, nullable=True)
 
 
 class CalculationHistory(Base):

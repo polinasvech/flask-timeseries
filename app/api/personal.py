@@ -8,6 +8,7 @@ from schemas import UpdateUserSchema
 from services.user_service import UserService
 from sqlalchemy.exc import IntegrityError
 from swagger import personal as swagger_personal
+from flask_login import logout_user
 
 bp = Blueprint("personal", __name__, url_prefix="/personal")
 
@@ -53,3 +54,18 @@ def change_password():
         return "Password changed successfully", 200
 
     return "Wrong current password", 400
+
+
+@bp.post("/delete")
+@swag_from(swagger_personal.DELETE_PROFILE)
+@login_required
+def delete_user():
+    password = request.values["password"]
+
+    user = UserService.get_user_by_id(current_user.get_id())
+    if UserService.auth(user.username, password):
+        UserService.delete(current_user.get_id())
+        logout_user()
+        return "Successfully deleted user", 200
+
+    return "Something went wrong...", 400

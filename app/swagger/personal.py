@@ -59,3 +59,23 @@ CHANGE_PASSWORD = {
     },
     "tags": ["personal"],
 }
+
+
+DELETE_PROFILE = {
+    "summary": "Change password",
+    "parameters": [
+        {
+            "name": "password",
+            "in": "formData",
+            "description": "password",
+            "required": True,
+            "type": "string",
+            "format": "password",
+        },
+    ],
+    "responses": {
+        200: {"description": "Successful delete"},
+        400: {"description": "Bad Request"},
+    },
+    "tags": ["personal"],
+}
