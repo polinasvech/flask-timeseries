@@ -30,10 +30,9 @@ class UserService:
         """
         Обновление данных пользователя
         """
-        bcrypt = Bcrypt(app)
-
         user_info = user_info.dict(exclude_none=True)
         if user_info.get("password"):
+            bcrypt = Bcrypt(app)
             hashed_pass = bcrypt.generate_password_hash(user_info.get("password")).decode("utf-8")
             user_info["password"] = hashed_pass
 
@@ -47,7 +46,7 @@ class UserService:
     @classmethod
     def delete(cls, user_id: int):
         """
-        Обновление данных пользователя
+        Удалание пользователя
         """
         with Session() as session:
             user = session.query(User).where(User.id == user_id).first()
@@ -59,7 +58,7 @@ class UserService:
         """
         Для проверки данных пользователя
 
-        :return: True если пароли совпадают
+        :return: объект пользователя, если пароли совпадают
         """
         with Session() as session:
             user = session.query(User).where(and_(User.username == username, User.deleted_at.is_(None))).first()
