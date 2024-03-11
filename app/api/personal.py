@@ -25,10 +25,31 @@ def get_calculation_history():
 @swag_from(swagger_personal.CHANGE_USERNAME)
 @login_required
 def change_username():
-    update_info = UpdateUserSchema(id=1, username=request.values["new_username"])
+    update_info = UpdateUserSchema(id=current_user.get_id(), username=request.values["new_username"])
     try:
         UserService.update(update_info)
     except IntegrityError:
         return "Username already taken", 400
 
     return "Username changed successfully", 200
+
+
+@bp.post("/change_password")
+@swag_from(swagger_personal.CHANGE_PASSWORD)
+@login_required
+def change_password():
+    current_password = request.values["current_password"]
+    new_password = request.values["new_password"]
+    repeated_password = request.values["repeated_password"]
+
+    user = UserService.get_user_by_id(current_user.get_id())
+    if UserService.auth(user.username, current_password):
+        if new_password != repeated_password:
+            return "Password mismatch", 400
+
+        update_info = UpdateUserSchema(id=current_user.get_id(), password=new_password)
+        UserService.update(update_info)
+
+        return "Password changed successfully", 200
+
+    return "Wrong current password", 400

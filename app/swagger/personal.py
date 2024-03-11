@@ -29,6 +29,14 @@ CHANGE_PASSWORD = {
     "summary": "Change password",
     "parameters": [
         {
+            "name": "current_password",
+            "in": "formData",
+            "description": "Current password",
+            "required": True,
+            "type": "string",
+            "format": "password",
+        },
+        {
             "name": "new_password",
             "in": "formData",
             "description": "New password",
