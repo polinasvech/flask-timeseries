@@ -1,8 +1,7 @@
 from datetime import datetime
 
 from flask_login import UserMixin
-from sqlalchemy import (JSON, Boolean, Column, DateTime, ForeignKey, Integer,
-                        String, Text, create_engine, event)
+from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -23,7 +22,10 @@ class User(UserMixin, Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
+
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, nullable=True)
+    deleted_at = Column(DateTime, default=datetime.utcnow, nullable=True)
 
 
 class CalculationHistory(Base):

@@ -1,7 +1,12 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel
+
+
+class UpdateUserSchema(BaseModel):
+    id: int
+    username: str | None = None
+    password: str | None = None
 
 
 class UserSchema(BaseModel):
@@ -14,11 +19,11 @@ class HistoryItemSchema(BaseModel):
     time_series: str = None
     date: str = None
     success: bool = False
-    anomalies: Optional[dict] = None
-    stationarity: Optional[dict] = None
-    autocorrelation: Optional[dict] = None
-    trends: Optional[dict] = None
-    errors: Optional[dict] = None
+    anomalies: dict | None = None
+    stationarity: dict | None = None
+    autocorrelation: dict | None = None
+    trends: dict | None = None
+    errors: dict | None = None
 
     def __init__(self, history_item):
         super().__init__()

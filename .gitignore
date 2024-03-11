@@ -159,3 +159,4 @@ cython_debug/
 
 # SQLite files
 *.db
+ts-database.db

@@ -1,19 +1,19 @@
 from datetime import datetime
-from typing import List, Union
 
 from exceptions import UserNotFoundError
+from flask import current_app as app
+from flask_bcrypt import Bcrypt
 from models import CalculationHistory, Session, User
-from schemas import HistoryItemSchema, UserSchema
+from schemas import HistoryItemSchema, UpdateUserSchema, UserSchema
 
 
 class UserService:
     @staticmethod
-    def create(username, password) -> User:
+    def create(username: str, password: str) -> User:
         """
         Создание нового пользователя
         """
-        from bcrypt_settings import bcrypt
-
+        bcrypt = Bcrypt(app)
         hashed_pass = bcrypt.generate_password_hash(password).decode("utf-8")
         user = User(
             username=username,
@@ -25,25 +25,42 @@ class UserService:
             session.commit()
         return user
 
+    @classmethod
+    def update(cls, user_info: UpdateUserSchema):
+        """
+        Обновление данных пользователя
+        """
+        bcrypt = Bcrypt(app)
+
+        user_info = user_info.dict(exclude_none=True)
+        if user_info.get("password"):
+            hashed_pass = bcrypt.generate_password_hash(user_info.get("password")).decode("utf-8")
+            user_info["password"] = hashed_pass
+
+        with Session() as session:
+            user = session.query(User).where(User.id == user_info["id"]).first()
+            for key, value in user_info.items():
+                setattr(user, key, value)
+            session.commit()
+
     @staticmethod
-    def auth(username, password) -> Union[User, None]:
+    def auth(username: str, password: str) -> User | None:
         """
         Для проверки данных пользователя
 
         :return: True если пароли совпадают
         """
-        from bcrypt_settings import bcrypt
-
         with Session() as session:
             user = session.query(User).filter(User.username == username).first()
         if not user:
             raise UserNotFoundError
 
+        bcrypt = Bcrypt(app)
         if bcrypt.check_password_hash(user.password, password):
             return user
 
     @staticmethod
-    def get_user_by_id(user_id) -> User:
+    def get_user_by_id(user_id: int) -> User:
         """
         Получение пользователя по id
         """
@@ -52,7 +69,7 @@ class UserService:
         return user
 
     @staticmethod
-    def list_users() -> List[dict]:
+    def list_users() -> list[dict]:
         """
         Для получения списка пользователей
 
@@ -61,7 +78,11 @@ class UserService:
         with Session() as session:
             users = session.query(User).all()
             return [
-                UserSchema(id=user.id, username=user.username, registration_date=user.created_at).dict()
+                UserSchema(
+                    id=user.id,
+                    username=user.username,
+                    registration_date=user.created_at,
+                ).dict()
                 for user in users
             ]
 

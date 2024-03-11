@@ -1,15 +1,13 @@
 import swagger_schemas
-from api.auth import bp as auth_bp
-from api.personal import bp as personal_bp
-from exceptions import (DatasetNotFoundError, EmptyFileError,
-                        FileExtensionError, NotTimeSeriesError,
-                        UserNotFoundError)
+from exceptions import DatasetNotFoundError, EmptyFileError, FileExtensionError, NotTimeSeriesError, UserNotFoundError
 from flasgger import Swagger, swag_from
 from flask import Flask
 from flask import json as flask_json
 from flask import request
 from flask_login import LoginManager, current_user, login_required
-from services import AnalyzeService, FileService, UserService
+from services.analyze_service import AnalyzeService
+from services.file_service import FileService
+from services.user_service import UserService
 
 app = Flask(__name__)
 # для авторизации
@@ -77,9 +75,12 @@ def before_request():
 
 
 if __name__ == "__main__":
-    app.secret_key = "37f2ab79-9be0-4c0b-8c73-8ac63a816629"
+    from api.auth import bp as auth_bp
+    from api.personal import bp as personal_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(personal_bp)
+
+    app.secret_key = "37f2ab79-9be0-4c0b-8c73-8ac63a816629"
 
     app.run(debug=True)

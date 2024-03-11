@@ -3,7 +3,7 @@ from exceptions import UserNotFoundError
 from flasgger import swag_from
 from flask import Blueprint, request
 from flask_login import login_user, logout_user
-from services import UserService
+from services.user_service import UserService
 from swagger import auth as swagger_auth
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -35,7 +35,7 @@ def register():
     repeated_password = request.values["repeated_password"]
 
     if password != repeated_password:
-        return f"Password mismatch", 400
+        return "Password mismatch", 400
 
     try:
         user = UserService.create(username, password)
