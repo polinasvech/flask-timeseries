@@ -1,6 +1,6 @@
-import sqlalchemy.exc
 import swagger_schemas
 from api.auth import bp as auth_bp
+from api.personal import bp as personal_bp
 from exceptions import (DatasetNotFoundError, EmptyFileError,
                         FileExtensionError, NotTimeSeriesError,
                         UserNotFoundError)
@@ -8,8 +8,7 @@ from flasgger import Swagger, swag_from
 from flask import Flask
 from flask import json as flask_json
 from flask import request
-from flask_login import (LoginManager, current_user, login_required,
-                         login_user, logout_user)
+from flask_login import LoginManager, current_user, login_required
 from services import AnalyzeService, FileService, UserService
 
 app = Flask(__name__)
@@ -36,15 +35,6 @@ def load_user(user):
 def get_users():
     users = UserService.list_users()
     return users
-
-
-@app.get("/calculation_history")
-@swag_from(swagger_schemas.CALC_HISTORY)
-@login_required
-def get_calculation_history():
-    result = {"history": UserService.user_calc_history(user_id=current_user.get_id())}
-    response = app.response_class(response=flask_json.dumps(result), mimetype="application/json")
-    return response, 200
 
 
 @app.post("/upload_dataset")
@@ -90,5 +80,6 @@ if __name__ == "__main__":
     app.secret_key = "37f2ab79-9be0-4c0b-8c73-8ac63a816629"
 
     app.register_blueprint(auth_bp)
+    app.register_blueprint(personal_bp)
 
     app.run(debug=True)

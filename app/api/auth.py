@@ -4,13 +4,13 @@ from flasgger import swag_from
 from flask import Blueprint, request
 from flask_login import login_user, logout_user
 from services import UserService
-from swagger import auth
+from swagger import auth as swagger_auth
 
-bp = Blueprint("user", __name__, url_prefix="/auth")
+bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 @bp.post("/login")
-@swag_from(auth.LOGIN)
+@swag_from(swagger_auth.LOGIN)
 def login():
     username = request.values["username"]
     password = request.values["password"]
@@ -28,7 +28,7 @@ def login():
 
 
 @bp.post("/register")
-@swag_from(auth.REGISTER)
+@swag_from(swagger_auth.REGISTER)
 def register():
     username = request.values["username"]
     password = request.values["password"]
@@ -47,7 +47,7 @@ def register():
 
 
 @bp.post("/logout")
-@swag_from(auth.LOGOUT)
+@swag_from(swagger_auth.LOGOUT)
 def logout():
     logout_user()
     return "Success", 200
