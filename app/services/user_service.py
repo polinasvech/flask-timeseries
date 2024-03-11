@@ -3,7 +3,7 @@ from typing import List, Union
 
 from exceptions import UserNotFoundError
 from models import CalculationHistory, Session, User
-from schemas import UserSchema, HistoryItemSchema
+from schemas import HistoryItemSchema, UserSchema
 
 
 class UserService:
@@ -79,7 +79,7 @@ class UserService:
         result = {
             "user": username,
             "history": [HistoryItemSchema(i).dict() for i in history_items],
-            "total": len(history_items)
+            "total": len(history_items),
         }
 
         return result

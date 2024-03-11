@@ -2,10 +2,10 @@ import os
 import re
 
 import pandas as pd
+from dateutil.parser import parse
 from exceptions import FileExtensionError, NotTimeSeriesError
 from flask import current_app as app
 from werkzeug.datastructures.file_storage import FileStorage
-from dateutil.parser import parse
 
 
 def is_date(string, fuzzy=False):

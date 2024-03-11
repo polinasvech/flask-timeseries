@@ -1,5 +1,6 @@
 import sqlalchemy.exc
 import swagger_schemas
+from api.auth import bp as auth_bp
 from exceptions import (DatasetNotFoundError, EmptyFileError,
                         FileExtensionError, NotTimeSeriesError,
                         UserNotFoundError)
@@ -27,50 +28,6 @@ app.config["FILE_UPLOAD_FOLDER"] = "/datasets"
 def load_user(user):
     user = UserService.get_user_by_id(user)
     return user
-
-
-@app.post("/login")
-@swag_from(swagger_schemas.LOGIN)
-def login():
-    username = request.values["username"]
-    password = request.values["password"]
-
-    try:
-        user = UserService.auth(username, password)
-    except UserNotFoundError as e:
-        return e.message, 404
-
-    if user:
-        login_user(user)
-        return "Success", 200
-
-    return "Wrong password", 401
-
-
-@app.post("/register")
-@swag_from(swagger_schemas.REGISTER)
-def register():
-    username = request.values["username"]
-    password = request.values["password"]
-    repeated_password = request.values["repeated_password"]
-
-    if password != repeated_password:
-        return f"Password mismatch", 400
-
-    try:
-        user = UserService.create(username, password)
-    except sqlalchemy.exc.IntegrityError:
-        return f"User {username} already exists", 409
-
-    if user:
-        return f"Created user {username}", 201
-
-
-@app.post("/logout")
-@swag_from(swagger_schemas.LOGOUT)
-def logout():
-    logout_user()
-    return "Success", 200
 
 
 @app.get("/users")
@@ -131,4 +88,7 @@ def before_request():
 
 if __name__ == "__main__":
     app.secret_key = "37f2ab79-9be0-4c0b-8c73-8ac63a816629"
+
+    app.register_blueprint(auth_bp)
+
     app.run(debug=True)
